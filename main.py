@@ -91,7 +91,7 @@ def trans_line(s):
         
     
 
-def trans_full_file(full_chart, be_trans):
+def trans_full_file(full_chart):
     sz = len(full_chart)
     i, j = 0, 0
     while j < sz:
@@ -100,9 +100,8 @@ def trans_full_file(full_chart, be_trans):
         i, j = j, j + 1
         while j < sz and (len(full_chart[j]) == 0 or full_chart[j][0] != '&'): j = j + 1
         if full_chart[i][0:7] == f'&inote_' and full_chart[i][8] == '=':
-            if full_chart[i][7] in be_trans:
-                for k in range(i, j):
-                    full_chart[k] = trans_line(full_chart[k])
+            for k in range(i, j):
+                full_chart[k] = trans_line(full_chart[k])
     return full_chart
 
 def write_to_new_file(chart, filename):
@@ -113,8 +112,8 @@ def main():
     # filename = input('請輸入要被轉換的檔名：').strip()
     filename = 'maidata.txt'
     full_chart = read_file(filename)
-    be_trans = input('請輸入要被轉換的難度（例：2,3,7）：').strip().split(',')
-    full_chart = trans_full_file(full_chart, be_trans)
+    # be_trans = input('請輸入要被轉換的難度（例：2,3,7）：').strip().split(',')
+    full_chart = trans_full_file(full_chart)
     write_to_new_file(full_chart, 'translated_' + filename)
 
 if __name__ == '__main__':
