@@ -14,7 +14,7 @@ class Beats():
     def __init__(me, timing, chart):
         me.timing = timing
         me.charts = []
-        if chart != '': 
+        if chart != '':
             me.charts.append(chart)
     def same_time(me, other):
         return abs(me.timing - other.timing) < 1e-6
@@ -74,7 +74,7 @@ def trans_part(s):
         next_timing = final_timing if i == len(all_beats) - 1 else all_beats[i + 1].timing
         result += '{' + str(round(1.0/(next_timing - now_timing), 4)) + '}' + all_beats[i].chart() + ','
     return result
-        
+
 
 def trans_line(s):
     # print(f'trans_line, s = {s}')
@@ -83,13 +83,12 @@ def trans_line(s):
     while R < sz:
         while R + 1 < sz and s[R:R+2] != '{{': R = R + 1
         if R + 1 >= sz: break
-        L = R
-        R = L + 1
+        L, R = R, R + 1
         while s[R:R+2] != '}}': R = R + 1
         s = s[:L] + trans_part(s[L+2:R]) + s[R+2:]
     return s
-        
-    
+
+
 
 def trans_full_file(full_chart):
     sz = len(full_chart)

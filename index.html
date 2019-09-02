@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Simai Translator</title>
+    </head>
+    <body>
+        <textarea type="text" id="input" value=""> </textarea>
+        <button type="button" id="btn"> Translate! </button>
+        <textarea type="text" id="output" value="" readonly> </textarea>
+    </body>
+</html>
+
+<style>
+#input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 30%;
+    position: absolute;
+    left: 25%;
+    top: 10%;
+}
+#btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20%;
+    height: 5%;
+    position: absolute;
+    left: 40%;
+    top: 47.5%;
+}
+#output {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 30%;
+    position: absolute;
+    left: 25%;
+    bottom: 10%;
+}
+</style>
+
+<script>
+document.getElementById("btn").onclick = () => {
+    let text = document.getElementById("input").value
+    document.getElementById("output").value = transform_main(text)
+}
+
+class Beats {
+    constructor(timing, chart) {
+        this.timing = timing
+        this.charts = []
+        if (chart != '') {
+            this.charts.push(chart)
+        }
+    }
+
+    same_time(other) {
+        return Math.abs(this.timing - other.timing) < 1e-6
+    }
+
+    add_beat(other) {
+        for (let i in other.charts) {
+            this.charts.push(other.charts[i])
+        }
+    }
+
+    chart() {
+        return this.charts.join('/')
+    }
+}
+
+// Format: `{{"{8},,,,,,{4}," "{6},,,,,," "{3},,,"}}`
+function get_beats(s) {
+    let aa = s.split(/(\{\d+.?\d*\})/)
+    let beats = []
+    let timing = 0
+    for (let i = 1; i < aa.length; i++) {
+        let beat = parseFloat(aa[i].substring(1, aa[i].length - 1))
+        let this_time = 1 / beat
+        i++
+        aaa = aa[i].split(',')
+        aaa.splice(-1)
+        for (let j in aaa) {
+            beats.push(new Beats(timing, aaa[j]))
+            timing += this_time
+        }
+    }
+    return [beats, timing]
+}
+
+function unique_beats(beats) {
+    let result = []
+    for (let i in beats) {
+        if (result.length == 0 || !result[result.length - 1].same_time(beats[i])) {
+            result.push(beats[i])
+        } else {
+            result[result.length - 1].add_beat(beats[i])
+        }
+    }
+    return result
+}
+
+function trans_part(s) {
+    let sz = s.length
+    let L = 0, R = 0
+    let all_beats = []
+    let beats, final_timing
+    while (R < sz) {
+        while (R < sz && s[R] != '"') R++
+        if (R >= sz) break
+        [L, R] = [R, R + 1]
+        while (s[R] != '"') R++
+        [beats, final_timing] = get_beats(s.substring(L + 1, R))
+        for (let i in beats) all_beats.push(beats[i])
+        R++
+    }
+    all_beats.sort((a, b) => { return a.timing - b.timing })
+    all_beats = unique_beats(all_beats)
+    result = ''
+    for (let i = 0; i < all_beats.length; i++) {
+        let now_timing = all_beats[i].timing
+        let next_timing = (i == all_beats.length - 1 ? final_timing : all_beats[i + 1].timing)
+        result += `{${Math.round(10000 / (next_timing - now_timing)) / 10000}}${all_beats[i].chart()},`
+    }
+    return result
+}
+
+function trans_line(s) {
+    console.log(`trans_line s = ${s}`)
+    let sz = s.length
+    let L = 0, R = 0
+    while (R < sz) {
+        while (R + 1 < sz && s.substring(R, R + 2) != '{{') R++
+        if (R + 1 >= sz) break
+        [L, R] = [R, R + 1]
+        while (s.substring(R, R + 2) != '}}') R++
+        s = s.substring(0, L) + trans_part(s.substring(L + 2, R)) + s.substring(R + 2)
+    }
+    return s
+}
+
+function trans_full_file(full_chart) {
+    let sz = full_chart.length
+    let i = 0, j = 0
+    while (j < sz) {
+        while (j < sz && (full_chart[j].length == 0 || full_chart[j][0] != '&')) j++
+        if (j >= sz) break
+        [i, j] = [j, j + 1]
+        while (j < sz && (full_chart[j].length == 0 || full_chart[j][0] != '&')) j++
+        if (full_chart[i].substring(0, 7) == '&inote_' && full_chart[i][8] == '=')
+            for (let k = i; k < j; k++)
+                full_chart[k] = trans_line(full_chart[k])
+    }
+    return full_chart.join('\n')
+}
+
+function transform_main(full_chart) {
+    console.log(`transform_main = ${full_chart}`)
+    return trans_full_file(full_chart.split('\n'))
+}
+
+</script>
