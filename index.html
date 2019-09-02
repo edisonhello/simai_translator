@@ -5,6 +5,9 @@
         <title>Simai Translator</title>
     </head>
     <body>
+        <div>
+            <a href="https://github.com/edisonhello/simai_translator"> 本專案 Repository，內含說明 </a>
+        </div>
         <textarea type="text" id="input" value=""></textarea>
         <button type="button" id="btn"> Translate! </button>
         <textarea type="text" id="output" value="" readonly></textarea>
@@ -163,5 +166,8 @@ function transform_main(full_chart) {
     console.log(`transform_main = ${full_chart}`)
     return trans_full_file(full_chart.split('\n'))
 }
+
+document.getElementById("input").value = `&inote_3=\n{{ "{3}3,3,3," "{4}4,4,4,4," }}\n`
+document.getElementById("btn").onclick()
 
 </script>
