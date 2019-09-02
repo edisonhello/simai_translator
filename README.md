@@ -28,9 +28,15 @@
 
 ## 使用方法
 
-1. 首先必須要有 Python 3 環境（開發使用環境是 Python 3.7.3）。
-2. 將 `main.py` 放到跟譜面相同的資料夾，執行 `main.py`。
-3. 轉換好的檔案會放在 `translated_maidata.txt`。
+* 離線版
+    1. 首先必須要有 Python 3 環境（開發使用環境是 Python 3.7.3）。
+    2. 將 `main.py` 放到跟譜面相同的資料夾，執行 `main.py`。
+    3. 轉換好的檔案會放在 `translated_maidata.txt`。
+
+* 網頁版
+    1. 打開 [Simai Translator 網頁版](https://edisonhello.github.io/simai_translator/)。
+    2. 把譜面貼上去，按下 `Translate!`。
+    3. 轉換好的譜面會在下面。
 
 ## 注意事項
 
